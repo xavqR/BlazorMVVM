@@ -1,7 +1,6 @@
-﻿
-@using Infrastructure.MVVM.Commands
+﻿@using Infrastructure.MVVM.Commands
 
-<button class="@Class" @onclick="@(() => ExecuteCommand(this.CommandParameter))">@Text</button>
+<button class="@Class" @onclick="@OnClickHandler">@Text</button>
 
 @code
 {
@@ -17,8 +16,12 @@
     [Parameter]
     public object CommandParameter { get; set; }
 
-    private void ExecuteCommand(object commandParameter)
+    [Parameter] 
+    public object Receiver { get; set; }
+
+    public async Task OnClickHandler()
     {
-        this.Command.Execute(commandParameter);            
-    }
+        EventCallback onClick = EventCallback.Factory.Create(Receiver, this.Command.Execute);
+        await onClick.InvokeAsync(this.CommandParameter);
+    }    
 }

@@ -1,10 +1,9 @@
 ﻿@page "/counter"
+@implements IDisposable
 
 @using Infrastructure.MVVM
 
-@inject IFactory CounterFactory
-@inject IVMInitializer CounterVMInitializer
-@inject CounterVM CounterVM
+@inject ICounterFactory CounterFactory
 
 <PageTitle>Counter</PageTitle>
 
@@ -12,22 +11,53 @@
 
 <p role="status">Current count: @CounterVM.CurrentCounter</p>
 
-<CommandButton Class="btn btn-primary" Text="Click Me" Command=@CounterVM.IncrementCountCommand/>
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<CommandButton Class="btn btn-primary" Text="Click Me" Command=@CounterVM.IncrementCountCommand Receiver=this />
 
 @code
 {
+    private IVMDataSource counterVMDataSource;
+    public CounterVM CounterVM { get; private set; }    
+
     protected override async Task OnInitializedAsync()
-    {
-        if (!this.CounterFactory.IsCreated)
-        {
-            this.CounterFactory.Create();
-        }
-        this.CounterVMInitializer.Initialize();
+    {       
+        CounterInfrastructure counterInfrastructure = this.CounterFactory.Create();
+        this.CounterVM = counterInfrastructure.CounterVM;
+        this.counterVMDataSource = counterInfrastructure.CounterVMDataSource;
+        counterInfrastructure.CounterVMInitializer.Initialize();
+
+         await base.OnInitializedAsync();
     }
 
-      private void IncrementCount()
+    private bool disposed = false;
+
+    #region IDisposable
+
+    public void Dispose()
     {
-        CounterVM.IncrementCountCommand.Execute(null);
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            if (disposing)
+            {
+                // Free other state (managed objects).
+                ((IDisposable)this.counterVMDataSource).Dispose();
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+        }
+    }
+
+    // Use C# destructor syntax for finalization code.
+    ~Counter()
+    {
+        Dispose(false);
+    }
+    
+    #endregion
 }

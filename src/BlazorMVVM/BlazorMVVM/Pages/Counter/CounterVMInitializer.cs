@@ -4,18 +4,18 @@ namespace BlazorMVVM.Pages.Counter
 {
     public class CounterVMInitializer : IVMInitializer
     {
-        private readonly CounterModel counterModel;
+        private readonly CounterVM counterVM;
 
-        public CounterVMInitializer(CounterModel counterModel)
+        public CounterVMInitializer(CounterVM counterVM)
         {
-            ParameterChecker.IsNotNull(counterModel, nameof(counterModel));
+            ParameterChecker.IsNotNull(counterVM, nameof(counterVM));
 
-            this.counterModel = counterModel;
+            this.counterVM = counterVM;
         }
 
         public void Initialize()
         {
-            this.counterModel.Counter = 10;
+            this.counterVM.CurrentCounter = 10;
         }
     }
 }

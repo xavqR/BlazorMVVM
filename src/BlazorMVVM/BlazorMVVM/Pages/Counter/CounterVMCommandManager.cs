@@ -17,6 +17,5 @@ namespace BlazorMVVM.Pages.Counter
         {
             this.counterModel.Counter++;
         }
-
     }
 }

@@ -3,39 +3,34 @@ using Infrastructure.MVVM.Commands;
 
 namespace BlazorMVVM.Pages.Counter
 {
-    public class CounterFactory : IFactory
+    public class CounterFactory : ICounterFactory
     {
         private readonly CounterVM counterVM;
-        private readonly ICounterVMCommandManager counterVMCommandManager;
         private readonly IVMDataSource counterVMDataSource;
+        private readonly IVMInitializer counterVMInitializer;
+        private readonly ICounterVMCommandManager counterVMCommandManager;
 
-        public bool IsCreated { get; private set; }
-
-        public CounterFactory(CounterVM counterVM, ICounterVMCommandManager counterVMCommandManager, IVMDataSource counterVMDataSource)
+        public CounterFactory(CounterVM counterVM, IVMDataSource counterVMDataSource, IVMInitializer counterVMInitializer, ICounterVMCommandManager counterVMCommandManager)
         {
             ParameterChecker.IsNotNull(counterVM, nameof(counterVM));
-            ParameterChecker.IsNotNull(counterVMCommandManager, nameof(counterVMCommandManager));
             ParameterChecker.IsNotNull(counterVMDataSource, nameof(counterVMDataSource));
+            ParameterChecker.IsNotNull(counterVMInitializer, nameof(counterVMInitializer));
+            ParameterChecker.IsNotNull(counterVMCommandManager, nameof(counterVMCommandManager));
 
             this.counterVM = counterVM;
-            this.counterVMCommandManager = counterVMCommandManager;
             this.counterVMDataSource = counterVMDataSource;
+            this.counterVMInitializer = counterVMInitializer;
+            this.counterVMCommandManager = counterVMCommandManager;
         }
 
-        public void Create()
+        public CounterInfrastructure Create()
         {
-            if (!this.IsCreated)
-            {
-                ICommand incrementCountCommand = new RelayCommand(this.counterVMCommandManager.IncrementCountExecute);
-                this.counterVM.SetCommands(incrementCountCommand); 
-                
-                this.counterVMDataSource.Start();
-                this.IsCreated = true;
-            } 
-            else
-            {
-                throw new Exception("CounterInfrastructureStarter is already started");
-            }
+            ICommand incrementCountCommand = new RelayCommand(this.counterVMCommandManager.IncrementCountExecute);
+            this.counterVM.SetCommands(incrementCountCommand);
+
+            this.counterVMDataSource.Start();
+
+            return new CounterInfrastructure(this.counterVM, this.counterVMDataSource, this.counterVMInitializer);
         }
     }
 }

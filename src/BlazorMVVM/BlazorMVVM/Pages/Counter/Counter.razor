@@ -1,0 +1,33 @@
+﻿@page "/counter"
+
+@using Infrastructure.MVVM
+
+@inject IFactory CounterFactory
+@inject IVMInitializer CounterVMInitializer
+@inject CounterVM CounterVM
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @CounterVM.CurrentCounter</p>
+
+<CommandButton Class="btn btn-primary" Text="Click Me" Command=@CounterVM.IncrementCountCommand/>
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        if (!this.CounterFactory.IsCreated)
+        {
+            this.CounterFactory.Create();
+        }
+        this.CounterVMInitializer.Initialize();
+    }
+
+      private void IncrementCount()
+    {
+        CounterVM.IncrementCountCommand.Execute(null);
+    }
+}

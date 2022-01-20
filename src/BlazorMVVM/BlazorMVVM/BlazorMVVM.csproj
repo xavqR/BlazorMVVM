@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Blazor.Controls\Infrastructure.Blazor.Controls.csproj" />
+    <ProjectReference Include="..\Infrastructure.MVVM\Infrastructure.MVVM.csproj" />
+  </ItemGroup>
+
+</Project>

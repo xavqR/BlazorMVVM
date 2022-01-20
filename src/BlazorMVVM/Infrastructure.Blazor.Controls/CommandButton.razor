@@ -1,0 +1,24 @@
+﻿
+@using Infrastructure.MVVM.Commands
+
+<button class="@Class" @onclick="@(() => ExecuteCommand(this.CommandParameter))">@Text</button>
+
+@code
+{
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public ICommand Command { get; set; }
+
+    [Parameter]
+    public object CommandParameter { get; set; }
+
+    private void ExecuteCommand(object commandParameter)
+    {
+        this.Command.Execute(commandParameter);            
+    }
+}

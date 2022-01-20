@@ -1,0 +1,10 @@
+﻿
+@using Infrastructure.MVVM.Commands
+
+<button class="btn btn-Command" @Command />
+
+@code
+{
+    [Parameter]
+    public ICommand Command { get; set; }
+}

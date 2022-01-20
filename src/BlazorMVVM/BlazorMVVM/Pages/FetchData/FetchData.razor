@@ -1,16 +1,19 @@
 ﻿@page "/fetchdata"
-@inject WeatherForecastService ForecastService
+@implements IDisposable
 
-<PageTitle>Weather forecast</PageTitle>
-
+@using BlazorMVVM.Pages.Counter
+@using Infrastructure.MVVM
 @using BlazorMVVM.Data
 
+@inject IFetchDataFactory fetchDataFactory
+
+<PageTitle>Weather forecast</PageTitle>
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from a service.</p>
 
-@if (forecasts == null)
+@if (fetchDataVM.ForecastsVM == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -26,24 +29,65 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (ForecastVM forecastVM in fetchDataVM.ForecastsVM)
             {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@forecastVM.Date</td>
+                    <td>@forecastVM.TemperatureC</td>
+                    <td>@forecastVM.TemperatureF</td>
+                    <td>@forecastVM.Summary</td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
-@code {
-    private WeatherForecast[]? forecasts;
+@code 
+{
+    private IVMDataSource fetchDataVMataSource;
+    private FetchDataVM fetchDataVM;  
 
     protected override async Task OnInitializedAsync()
-    {
-        forecasts = await this.ForecastService.GetForecastAsync(DateTime.Now);
+    {       
+        FetchDataInfrastructure fetchDataInfrastructure = this.fetchDataFactory.Create();
+        this.fetchDataVM = fetchDataInfrastructure.FetchDataVM;
+        this.fetchDataVMataSource = fetchDataInfrastructure.FetchDataVMDataSource;
+        fetchDataInfrastructure.FetchDataVMInitializer.Initialize();
+
+        await base.OnInitializedAsync();
     }
+
+    #region IDisposable
+
+    private bool disposed = false;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            if (disposing)
+            {
+                // Free other state (managed objects).
+                ((IDisposable)this.fetchDataVMataSource).Dispose();
+            }
+            // Free your own state (unmanaged objects).
+            // Set large fields to null.
+            disposed = true;
+        }
+    }
+
+    // Use C# destructor syntax for finalization code.
+    ~FetchData()
+    {
+        Dispose(false);
+    }
+    
+    #endregion
+
 }

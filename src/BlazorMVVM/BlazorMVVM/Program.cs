@@ -1,5 +1,6 @@
 using BlazorMVVM.Data;
 using BlazorMVVM.Pages.Counter;
+using BlazorMVVM.Pages.FetchData;
 using Infrastructure.MVVM;
 
 namespace BlazorMVVM
@@ -37,8 +38,8 @@ namespace BlazorMVVM
 
         private static void ConfigureServices(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddSingleton<WeatherForecastService>();
             ConfigureCounterServices(serviceCollection);
+            ConfigureFetchDataServices(serviceCollection);
         }
 
         private static void ConfigureCounterServices(IServiceCollection serviceCollection)
@@ -47,8 +48,19 @@ namespace BlazorMVVM
             CounterModel counterModel = new();
             serviceCollection.AddTransient<IVMInitializer>(x => new CounterVMInitializer(counterVM));
             serviceCollection.AddTransient<ICounterVMCommandManager>(x => new CounterVMCommandManager(counterModel));
-            serviceCollection.AddTransient<IVMDataSource>(x => new CounterVMDataSource(counterVM, counterModel));
+            serviceCollection.AddTransient<IVMDataSource, CounterVMDataSource>(x => new CounterVMDataSource(counterVM, counterModel));
             serviceCollection.AddTransient<ICounterFactory>(x => new CounterFactory(counterVM, x.GetRequiredService<IVMDataSource>(), x.GetRequiredService<IVMInitializer>(), x.GetRequiredService<ICounterVMCommandManager>()));
+        }
+
+        private static void ConfigureFetchDataServices(IServiceCollection serviceCollection)
+        {
+            FetchDataVM fetchDataVM = new();
+            FetchDataModel fetchDataModel = new();
+            serviceCollection.AddSingleton<IWeatherForecastService, WeatherForecastService>();
+            serviceCollection.AddTransient<IVMInitializer>(x => new FetchDataVMInitializer(fetchDataModel, x.GetRequiredService<IWeatherForecastService>()));
+            //serviceCollection.AddTransient<ICounterVMCommandManager>(x => new CounterVMCommandManager(counterModel));
+            serviceCollection.AddTransient<IVMDataSource>(x => new FetchDataVMDataSource(fetchDataVM, fetchDataModel));
+            serviceCollection.AddTransient<IFetchDataFactory>(x => new FetchDataFactory(fetchDataVM, x.GetRequiredService<IVMDataSource>(), x.GetRequiredService<IVMInitializer>()));
         }
     }
 }

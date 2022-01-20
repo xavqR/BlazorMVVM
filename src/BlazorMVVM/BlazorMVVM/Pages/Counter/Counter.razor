@@ -3,34 +3,34 @@
 
 @using Infrastructure.MVVM
 
-@inject ICounterFactory CounterFactory
+@inject ICounterFactory counterFactory
 
 <PageTitle>Counter</PageTitle>
 
 <h1>Counter</h1>
 
-<p role="status">Current count: @CounterVM.CurrentCounter</p>
+<p role="status">Current count: @counterVM.CurrentCounter</p>
 
-<CommandButton Class="btn btn-primary" Text="Click Me" Command=@CounterVM.IncrementCountCommand Receiver=this />
+<CommandButton Class="btn btn-primary" Text="Click Me" Command=@counterVM.IncrementCountCommand Receiver=this />
 
 @code
 {
     private IVMDataSource counterVMDataSource;
-    public CounterVM CounterVM { get; private set; }    
+    public CounterVM counterVM;  
 
     protected override async Task OnInitializedAsync()
     {       
-        CounterInfrastructure counterInfrastructure = this.CounterFactory.Create();
-        this.CounterVM = counterInfrastructure.CounterVM;
+        CounterInfrastructure counterInfrastructure = this.counterFactory.Create();
+        this.counterVM = counterInfrastructure.CounterVM;
         this.counterVMDataSource = counterInfrastructure.CounterVMDataSource;
         counterInfrastructure.CounterVMInitializer.Initialize();
 
-         await base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 
-    private bool disposed = false;
-
     #region IDisposable
+
+    private bool disposed = false;
 
     public void Dispose()
     {

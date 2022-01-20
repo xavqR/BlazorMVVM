@@ -5,7 +5,6 @@ namespace BlazorMVVM.Pages.Counter
 {
     public class CounterVMDataSource : IVMDataSource, IDisposable
     {
-        private bool isStarted;
         private readonly CounterVM counterVM;
         private readonly CounterModel counterModel;
 
@@ -20,16 +19,8 @@ namespace BlazorMVVM.Pages.Counter
 
         public void Start()
         {
-            if (!this.isStarted)
-            {
-                this.counterVM.PropertyChanged += this.OnCounterVMPropertyChanged;
-                this.counterModel.PropertyChanged += this.OnCounterModelPropertyChanged;
-                this.isStarted = true;
-            }
-            else
-            {
-                throw new Exception("CounterVMDataSource is already started");
-            }
+            this.counterVM.PropertyChanged += this.OnCounterVMPropertyChanged;
+            this.counterModel.PropertyChanged += this.OnCounterModelPropertyChanged;
         }
 
         private void OnCounterVMPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -80,7 +71,7 @@ namespace BlazorMVVM.Pages.Counter
 
         // Use C# destructor syntax for finalization code.
         ~CounterVMDataSource()
-        {            
+        {
             Dispose(false);
         }
 

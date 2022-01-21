@@ -1,6 +1,5 @@
 ﻿using BlazorMVVM.Pages.FetchData;
 using Infrastructure.MVVM;
-using Infrastructure.MVVM.Commands;
 
 namespace BlazorMVVM.Pages.Counter
 {
@@ -9,24 +8,20 @@ namespace BlazorMVVM.Pages.Counter
         private readonly FetchDataVM fetchDataVM;
         private readonly IVMDataSource fetchDataVMDataSource;
         private readonly IVMInitializer fetchDataVMInitializer;
-        //private readonly ICounterVMCommandManager counterVMCommandManager;
 
-        public FetchDataFactory(FetchDataVM fetchDataVM, IVMDataSource fetchDataVMDataSource, IVMInitializer fetchDataVMInitializer)
+        public FetchDataFactory(FetchDataVM fetchDataVM, IResolver<IVMDataSource> dataSourceResolver, IResolver<IVMInitializer> initializerResolver)
         {
             ParameterChecker.IsNotNull(fetchDataVM, nameof(fetchDataVM));
-            ParameterChecker.IsNotNull(fetchDataVMDataSource, nameof(fetchDataVMDataSource));
-            ParameterChecker.IsNotNull(fetchDataVMInitializer, nameof(fetchDataVMInitializer));
+            ParameterChecker.IsNotNull(dataSourceResolver, nameof(dataSourceResolver));
+            ParameterChecker.IsNotNull(initializerResolver, nameof(initializerResolver));
 
             this.fetchDataVM = fetchDataVM;
-            this.fetchDataVMDataSource = fetchDataVMDataSource;
-            this.fetchDataVMInitializer = fetchDataVMInitializer;
+            this.fetchDataVMDataSource = dataSourceResolver.Resolve(nameof(FetchDataVMDataSource));
+            this.fetchDataVMInitializer = initializerResolver.Resolve(nameof(FetchDataVMInitializer)); 
         }
 
         public FetchDataInfrastructure Create()
         {
-            //ICommand incrementCountCommand = new RelayCommand(this.counterVMCommandManager.IncrementCountExecute);
-            //this.fetchDataVM.SetCommands(incrementCountCommand);
-
             this.fetchDataVMDataSource.Start();
 
             return new FetchDataInfrastructure(this.fetchDataVM, this.fetchDataVMDataSource, this.fetchDataVMInitializer);

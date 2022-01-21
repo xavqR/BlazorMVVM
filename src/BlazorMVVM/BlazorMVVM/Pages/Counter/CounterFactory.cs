@@ -10,16 +10,16 @@ namespace BlazorMVVM.Pages.Counter
         private readonly IVMInitializer counterVMInitializer;
         private readonly ICounterVMCommandManager counterVMCommandManager;
 
-        public CounterFactory(CounterVM counterVM, IVMDataSource counterVMDataSource, IVMInitializer counterVMInitializer, ICounterVMCommandManager counterVMCommandManager)
+        public CounterFactory(CounterVM counterVM, IResolver<IVMDataSource> dataSourceResolver, IResolver<IVMInitializer> initializerResolver, ICounterVMCommandManager counterVMCommandManager)
         {
             ParameterChecker.IsNotNull(counterVM, nameof(counterVM));
-            ParameterChecker.IsNotNull(counterVMDataSource, nameof(counterVMDataSource));
-            ParameterChecker.IsNotNull(counterVMInitializer, nameof(counterVMInitializer));
+            ParameterChecker.IsNotNull(dataSourceResolver, nameof(dataSourceResolver));
+            ParameterChecker.IsNotNull(initializerResolver, nameof(initializerResolver));
             ParameterChecker.IsNotNull(counterVMCommandManager, nameof(counterVMCommandManager));
 
             this.counterVM = counterVM;
-            this.counterVMDataSource = counterVMDataSource;
-            this.counterVMInitializer = counterVMInitializer;
+            this.counterVMDataSource = dataSourceResolver.Resolve(nameof(CounterVMDataSource));
+            this.counterVMInitializer = initializerResolver.Resolve(nameof(CounterVMInitializer)); 
             this.counterVMCommandManager = counterVMCommandManager;
         }
 

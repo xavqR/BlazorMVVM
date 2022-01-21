@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Infrastructure.MVVM.Commands
+﻿namespace Infrastructure.MVVM.Commands
 {
     public interface ICommand
     {

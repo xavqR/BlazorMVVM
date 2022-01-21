@@ -1,11 +1,9 @@
-﻿using Infrastructure.MVVM.Commands;
-
-namespace Infrastructure.MVVM
+﻿namespace Infrastructure.MVVM
 {
 	/// <summary>
 	/// Defines the implementation of <see cref="IRaisableCommand"/>.
 	/// </summary>
-	public interface IRaisableCommand : ICommand
+	public interface IRaisableCommand 
 	{
 		/// <summary>
 		/// Raise command can execute.

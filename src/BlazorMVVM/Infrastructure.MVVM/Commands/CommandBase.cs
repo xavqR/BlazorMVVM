@@ -1,3 +1,4 @@
+using Infrastructure.MVVM.Commands;
 using System.Diagnostics;
 
 namespace Infrastructure.MVVM
@@ -5,7 +6,7 @@ namespace Infrastructure.MVVM
     /// <summary>
     /// This class responsibility is to manage the base logic of the CanExecuteChanged command event.
     /// </summary>
-    public abstract class CommandBase : IRaisableCommand
+    public abstract class CommandBase : IRaisableCommand, ICommand
     {
         #region Events
 

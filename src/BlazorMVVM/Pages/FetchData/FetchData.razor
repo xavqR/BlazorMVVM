@@ -13,7 +13,7 @@
 
 <p>This component demonstrates fetching data from a service.</p>
 
-@if (fetchDataVM.ForecastsVM == null)
+@if (!fetchDataVM.ForecastsVM.Any())
 {
     <p><em>Loading...</em></p>
 }
@@ -42,19 +42,20 @@ else
     </table>
 }
 
-@code 
+@code
 {
-    private IVMDataSource fetchDataVMataSource;
-    private FetchDataVM fetchDataVM;  
+    private IDisposable fetchDataVMataSource;
+    private FetchDataVM fetchDataVM;
+    private CancellationTokenSource cancellationTokenSource;
 
     protected override async Task OnInitializedAsync()
-    {       
+    {
         FetchDataInfrastructure fetchDataInfrastructure = this.fetchDataFactory.Create();
         this.fetchDataVM = fetchDataInfrastructure.FetchDataVM;
-        this.fetchDataVMataSource = fetchDataInfrastructure.FetchDataVMDataSource;
-        fetchDataInfrastructure.FetchDataVMInitializer.Initialize();
-
-        await base.OnInitializedAsync();
+        this.fetchDataVMataSource = (IDisposable)fetchDataInfrastructure.FetchDataVMDataSource;
+        
+        cancellationTokenSource = new CancellationTokenSource();
+        await Task.Run(()=> fetchDataInfrastructure.FetchDataVMInitializer.InitializeAsync(cancellationTokenSource.Token), cancellationTokenSource.Token);
     }
 
     #region IDisposable
@@ -73,8 +74,9 @@ else
         {
             if (disposing)
             {
-                // Free other state (managed objects).
-                ((IDisposable)this.fetchDataVMataSource).Dispose();
+                // Free other state (managed objects).       
+                cancellationTokenSource.Cancel();
+                this.fetchDataVMataSource?.Dispose();
             }
             // Free your own state (unmanaged objects).
             // Set large fields to null.
@@ -87,7 +89,7 @@ else
     {
         Dispose(false);
     }
-    
+
     #endregion
 
 }

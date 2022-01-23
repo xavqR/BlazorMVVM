@@ -4,7 +4,7 @@ using Infrastructure.MVVM;
 
 namespace BlazorMVVM.Pages.Counter
 {
-    public class FetchDataVMInitializer : IVMInitializer
+    public class FetchDataVMInitializer : IVMInitializerAsync
     {
         private readonly FetchDataModel fetchDataModel;
         private readonly IWeatherForecastService weatherForecastService;
@@ -18,11 +18,16 @@ namespace BlazorMVVM.Pages.Counter
             this.weatherForecastService = weatherForecastService;
         }
 
-        public async void Initialize()
+        public async Task InitializeAsync(CancellationToken cancellationToken)
         {
-            List<WeatherForecast> forecasts = await this.weatherForecastService.GetForecastAsync(DateTime.Now);
-            fetchDataModel.Forecasts.Clear();
-            forecasts.ForEach(f => fetchDataModel.Forecasts.Add(f));            
+            ParameterChecker.IsNotNull(cancellationToken, nameof(cancellationToken));
+
+            fetchDataModel.Forecasts.Clear(); 
+            List<WeatherForecast> forecasts = this.weatherForecastService.GetForecastAsync(DateTime.Now).Result;      
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                forecasts.ForEach(f => fetchDataModel.Forecasts.Add(f));
+            }          
         }
     }
 }

@@ -46,27 +46,26 @@ namespace BlazorMVVM
 
         private static void ConfigureCounterServices(IServiceCollection serviceCollection)
         {
-            CounterVM counterVM = new();
-            CounterModel counterModel = new();
-            serviceCollection.AddTransient<CounterVMInitializer>(x => new CounterVMInitializer(counterVM));
-            serviceCollection.AddTransient<CounterVMDataSource>(x => new CounterVMDataSource(counterVM, counterModel));
-            serviceCollection.AddTransient<ICounterVMCommandManager>(x => new CounterVMCommandManager(counterModel));          
-            serviceCollection.AddTransient<ICounterFactory>(x => new CounterFactory(counterVM, x.GetRequiredService<IResolver<IVMDataSource>>(), x.GetRequiredService<IResolver<IVMInitializer>>(), x.GetRequiredService<ICounterVMCommandManager>()));
+            serviceCollection.AddScoped<CounterVM>();
+            serviceCollection.AddScoped<CounterModel>();
+            serviceCollection.AddTransient<IVMInitializer, CounterVMInitializer>(x => new CounterVMInitializer(x.GetRequiredService<CounterVM>()));
+            serviceCollection.AddTransient<CounterVMDataSource>(x => new CounterVMDataSource(x.GetRequiredService<CounterVM>(), x.GetRequiredService<CounterModel>()));
+            serviceCollection.AddTransient<ICounterVMCommandManager>(x => new CounterVMCommandManager(x.GetRequiredService<CounterModel>()));
+            serviceCollection.AddTransient<ICounterFactory>(x => new CounterFactory(x.GetRequiredService<CounterVM>(), x.GetRequiredService<IResolver<IVMDataSource>>(), x.GetRequiredService<IVMInitializer>(), x.GetRequiredService<ICounterVMCommandManager>()));
         }
 
         private static void ConfigureFetchDataServices(IServiceCollection serviceCollection)
-        {
-            FetchDataVM fetchDataVM = new();
-            FetchDataModel fetchDataModel = new();
+        {          
+            serviceCollection.AddScoped<FetchDataVM>();
+            serviceCollection.AddScoped<FetchDataModel>();
             serviceCollection.AddSingleton<IWeatherForecastService, WeatherForecastService>();
-            serviceCollection.AddTransient<FetchDataVMInitializer>(x => new FetchDataVMInitializer(fetchDataModel, x.GetRequiredService<IWeatherForecastService>()));
-            serviceCollection.AddTransient<FetchDataVMDataSource>(x => new FetchDataVMDataSource(fetchDataVM, fetchDataModel));
-            serviceCollection.AddTransient<IFetchDataFactory>(x => new FetchDataFactory(fetchDataVM, x.GetRequiredService<IResolver<IVMDataSource>>(), x.GetRequiredService<IResolver<IVMInitializer>>()));
+            serviceCollection.AddTransient<IVMInitializerAsync, FetchDataVMInitializer>(x => new FetchDataVMInitializer(x.GetRequiredService<FetchDataModel>(), x.GetRequiredService<IWeatherForecastService>()));
+            serviceCollection.AddTransient<FetchDataVMDataSource>(x => new FetchDataVMDataSource(x.GetRequiredService<FetchDataVM>(), x.GetRequiredService<FetchDataModel>()));
+            serviceCollection.AddTransient<IFetchDataFactory>(x => new FetchDataFactory(x.GetRequiredService<FetchDataVM>(), x.GetRequiredService<IResolver<IVMDataSource>>(), x.GetRequiredService<IVMInitializerAsync>()));
         }
 
         private static void ConfigureResolvers(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddTransient<IResolver<IVMInitializer>, VMInitializerResolver>();
             serviceCollection.AddTransient<IResolver<IVMDataSource>, VMDataSourceResolver>();
         }
     }

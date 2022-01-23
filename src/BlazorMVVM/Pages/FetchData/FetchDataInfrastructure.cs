@@ -7,9 +7,9 @@ namespace BlazorMVVM.Pages.Counter
     {
         public readonly FetchDataVM FetchDataVM;
         public readonly IVMDataSource FetchDataVMDataSource;
-        public readonly IVMInitializer FetchDataVMInitializer;
+        public readonly IVMInitializerAsync FetchDataVMInitializer;
 
-        public FetchDataInfrastructure(FetchDataVM fetchDataVM, IVMDataSource fetchDataVMDataSource, IVMInitializer fetchDataVMInitializer)
+        public FetchDataInfrastructure(FetchDataVM fetchDataVM, IVMDataSource fetchDataVMDataSource, IVMInitializerAsync fetchDataVMInitializer)
         {
             ParameterChecker.IsNotNull(fetchDataVM, nameof(fetchDataVM));
             ParameterChecker.IsNotNull(fetchDataVMDataSource, nameof(fetchDataVMDataSource));
